@@ -1,7 +1,8 @@
 package ezreal.service.feign;
 
-import java.util.Map;
+import java.util.List;
 
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -9,6 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface EurekaList {
 
 	@RequestMapping("/test/getServerList")
-	public Map<String, String> getEurekaList();
+	public List<ServiceInstance> getEurekaList();
 	
 }
