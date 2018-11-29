@@ -19,6 +19,8 @@ public class CreateService {
 	private ShellService shellService;
 	@Autowired
 	private GitService gitService;
+	@Autowired
+	private RefreshService refreshService;
 	
 	//保存所有容器ID的集合
 	private List<String> containerList = new ArrayList<>();
@@ -73,7 +75,8 @@ public class CreateService {
 		String containerId = shellService.createEureka(size++);
 		containerList.add(containerId);
 		
-		//TODO 刷新其他服务
+		// 使用 /refresh 接口重启其他服务
+		refreshService.refresh(uriList);
 	}
 	
 }
