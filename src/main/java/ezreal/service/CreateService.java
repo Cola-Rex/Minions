@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,8 @@ import ezreal.service.feign.EurekaList;
 @Service
 public class CreateService {
 
+	private static final Logger log = LoggerFactory.getLogger(CreateService.class);
+	
 	@Autowired
 	private EurekaList eurekaList;
 	@Autowired
@@ -47,13 +51,13 @@ public class CreateService {
 			//InetAddress addr = InetAddress.getLocalHost();
 			//新建 eureka 的uri
 			for (URI uri : uriList) {
-				if (uri.getPort() != 9001 + size) {
+				if (uri.getPort() != 9000 + size++) {
 					sb.append("http://" + uri.getHost() + ":" + uri.getPort() + "/eureka/,");
 				}
 			}
 			sb.deleteCharAt(sb.length() - 1); //删除最后1个逗号
 		}
-		
+		log.info("新建 eureka 的 uri : {}", sb);
 		gitService.createFile(size++, sb.toString());
 		
 		//更新其他 eureka 配置
@@ -67,12 +71,14 @@ public class CreateService {
 					sb1.append("http://" + temp.getHost() + ":" + uri.getPort() + "/eureka/,");
 				}
 				sb1.deleteCharAt(sb1.length() - 1);
+				log.info("更新服务：{}，serviceUri:{}", uri.getPort(), sb1);
 				gitService.updateFile(uri.getPort() - 9000, sb1.toString());
 			}
 		}
 		
 		//调用shell命令创建eureka server
 		String containerId = shellService.createEureka(size++);
+		log.info("新容器ID：{}", containerId);
 		containerList.add(containerId);
 		
 		// 使用 /refresh 接口重启其他服务
