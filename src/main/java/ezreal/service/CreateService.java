@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.stereotype.Service;
 
+import ezreal.entity.Minion;
+import ezreal.entity.MyServiceInstance;
+import ezreal.repository.MinionRepository;
 import ezreal.service.feign.EurekaList;
 
 @Service
@@ -25,6 +28,8 @@ public class CreateService {
 	private GitService gitService;
 	@Autowired
 	private RefreshService refreshService;
+	@Autowired
+	private MinionRepository minionRepository;
 	
 	//保存所有容器ID的集合
 	private List<String> containerList = new ArrayList<>();
@@ -33,13 +38,19 @@ public class CreateService {
 	
 	public void createEureka() {
 		//获取所有在线的eureka server
-		List<ServiceInstance> list = eurekaList.getEurekaList();
+		List<MyServiceInstance> list = eurekaList.getEurekaList();
 		//已经启动的 eureka server 数量
 		int size = list.size();
+		System.out.println(list.get(0).toString());
 		//判断是否有新的eureka，有则添加
 		for (ServiceInstance si : list) {
 			if (!uriList.contains(si.getUri())) {
 				uriList.add(si.getUri());
+				//将新的 server 保存到数据库中
+				Minion minion = new Minion();
+				minion.setMinionId(si.getServiceId());
+				minion.setAddress(si.getHost()+":"+si.getPort());
+				minionRepository.save(minion);
 			}
 		}
 		
