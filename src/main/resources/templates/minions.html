@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+
+    <title>Spring Minions</title>
+
+    <!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+</head>
+<body>
+<div class="container">
+    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+    <div th:if="${not #lists.isEmpty(minions)}">
+        <h2>Minion List</h2>
+        <table class="table table-striped">
+            <tr>
+                <th>Id</th>
+                <th>Minion Id</th>
+                <th>Address</th>
+                <th>View</th>
+                <th>Edit</th>
+            </tr>
+            <tr th:each="minion : ${minions}">
+                <td th:text="${minion.id}"><a href="/product/${product.id}">Id</a></td>
+                <td th:text="${minion.minionId}">Minion Id</td>
+                <td th:text="${minion.address}">Address</td>
+                <td><a th:href="${ '/minion/' + minion.id}">View</a></td>
+                <td><a th:href="${'/minion/edit/' + minion.id}">Edit</a></td>
+            </tr>
+        </table>
+
+    </div>
+</div>
+
+</body>
+</html>
