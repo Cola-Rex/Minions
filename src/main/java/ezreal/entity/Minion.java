@@ -12,8 +12,8 @@ public class Minion {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 	
-	private String MinionId;
-	private String AddressId;
+	private String minionId;
+	private String address;
 	
 	public Integer getId() {
 		return id;
@@ -22,16 +22,15 @@ public class Minion {
 		this.id = id;
 	}
 	public String getMinionId() {
-		return MinionId;
+		return minionId;
 	}
 	public void setMinionId(String minionId) {
-		MinionId = minionId;
+		this.minionId = minionId;
 	}
-	public String getAddressId() {
-		return AddressId;
+	public String getAddress() {
+		return address;
 	}
-	public void setAddressId(String addressId) {
-		AddressId = addressId;
+	public void setAddress(String address) {
+		this.address = address;
 	}
-	
 }
