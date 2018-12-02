@@ -7,21 +7,16 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.stereotype.Service;
 
 import ezreal.entity.Minion;
-import ezreal.entity.MyServiceInstance;
 import ezreal.repository.MinionRepository;
-import ezreal.service.feign.EurekaList;
 
 @Service
 public class CreateService {
 
 	private static final Logger log = LoggerFactory.getLogger(CreateService.class);
 	
-	@Autowired
-	private EurekaList eurekaList;
 	@Autowired
 	private ShellService shellService;
 	@Autowired
@@ -37,22 +32,10 @@ public class CreateService {
 	private ArrayList<URI> uriList = new ArrayList<>();
 	
 	public void createEureka() {
-		//获取所有在线的eureka server
-		List<MyServiceInstance> list = eurekaList.getEurekaList();
-		//已经启动的 eureka server 数量
-		int size = list.size();
-		System.out.println(list.get(0).toString());
-		//判断是否有新的eureka，有则添加
-		for (ServiceInstance si : list) {
-			if (!uriList.contains(si.getUri())) {
-				uriList.add(si.getUri());
-				//将新的 server 保存到数据库中
-				Minion minion = new Minion();
-				minion.setMinionId(si.getServiceId());
-				minion.setAddress(si.getHost()+":"+si.getPort());
-				minionRepository.save(minion);
-			}
-		}
+		//从数据库获取所有minion
+		List<Minion> list = minionRepository.findAll();
+		//当前数据库中minion的数量
+		long size = minionRepository.count();
 		
 		//创建新的 eureka 配置文件
 		StringBuilder sb = new StringBuilder();
@@ -61,29 +44,32 @@ public class CreateService {
 		} else {
 			//InetAddress addr = InetAddress.getLocalHost();
 			//新建 eureka 的uri
-			for (URI uri : uriList) {
-				if (uri.getPort() != 9000 + size++) {
-					sb.append("http://" + uri.getHost() + ":" + uri.getPort() + "/eureka/,");
-				}
+			for (Minion minion : list) {
+				sb.append("http://" + minion.getAddress() + "/eureka/,");
 			}
 			sb.deleteCharAt(sb.length() - 1); //删除最后1个逗号
 		}
-		log.info("新建 eureka 的 uri : {}", sb);
+		log.info("新建 eureka 的 defaultZone : {}", sb);
 		gitService.createFile(size++, sb.toString());
+		
+		//将当前新建 eureka 保存至数据库
+		Minion minion = new Minion();
+		minion.setAddress("localhost:" + size++);
+		minion.setMinionId(String.valueOf(size++));
+		minionRepository.save(minion);
 		
 		//更新其他 eureka 配置
 		if (size > 0) {
-			for (URI uri : uriList) {
-				StringBuilder sb1 = new StringBuilder();
-				@SuppressWarnings("unchecked")
-				List<URI> tempList = (List<URI>) uriList.clone();
-				tempList.remove(uri);
-				for (URI temp : tempList) {
-					sb1.append("http://" + temp.getHost() + ":" + uri.getPort() + "/eureka/,");
+			for (Minion mi : list) {
+				StringBuilder tempString = new StringBuilder();
+				List<Minion> tempList = new ArrayList<Minion>(list);
+				tempList.remove(mi); //移除当前配置服务的uri
+				for (Minion temp : tempList) {
+					tempString.append("http://" + temp.getAddress() + "/eureka/,");
 				}
-				sb1.deleteCharAt(sb1.length() - 1);
-				log.info("更新服务：{}，serviceUri:{}", uri.getPort(), sb1);
-				gitService.updateFile(uri.getPort() - 9000, sb1.toString());
+				tempString.append(minion.getAddress());//最后添加上面新建eureka的uri
+				log.info("更新服务：{}，serviceUri:{}", mi.getMinionId(), tempString);
+				gitService.updateFile(Long.parseLong(mi.getAddress().split(":")[1]), tempString.toString());
 			}
 		}
 		

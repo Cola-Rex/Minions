@@ -20,7 +20,7 @@ public class GitService {
 	private RestTemplate restTemplate = new RestTemplate();
 	//http://192.168.31.250/api/v4/projects/1/repository/files/test%2Etxt?
 	//private_token=pj2h2kV-9jwLy42YKz7G&branch=master&content=你是真的皮&commit_message=create%20a%20new%20file
-	public void createFile(int count, String serviceUrl) {
+	public void createFile(long count, String serviceUrl) {
 		Map<String, String> map = new HashMap<>();
 		map.put("private_token", "pj2h2kV-9jwLy42YKz7G");
 		map.put("branch", "master"); 					//分支
@@ -49,13 +49,13 @@ public class GitService {
 		log.info("gitlab API 返回" + result);
 	}
 	
-	public void updateFile(int count, String serviceUrl) {
+	public void updateFile(long count, String serviceUrl) {
 		Map<String, String> map = new HashMap<>();
 		map.put("private_token", "pj2h2kV-9jwLy42YKz7G");
 		map.put("branch", "master"); 					//分支
 		map.put("content", 
 				"server:\r\n" + 
-				"  port: 900" + count + "\r\n" + 
+				"  port: " + count + "\r\n" + 
 				"\r\n" + 
 				"spring:\r\n" + 
 				"  application:\r\n" + 

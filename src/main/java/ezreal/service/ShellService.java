@@ -14,7 +14,7 @@ public class ShellService {
 	
 	//docker run -d -e "spring.profiles.active=peer1" --network host eureka-server:0.0.1 后台执行
 	//docker run -it -e "spring.profiles.active=peer1" --network=host eureka-server:0.0.1 bash 交互执行
-	public String createEureka(int peerNumber) {
+	public String createEureka(long peerNumber) {
 		String containerId = "";
 		try {
 			String cmd = "docker run -d -e \"spring.profiles.active=peer" + peerNumber + "\" --network host eureka-server:0.0.1";
