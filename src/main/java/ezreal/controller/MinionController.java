@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import ezreal.entity.Minion;
 import ezreal.repository.MinionRepository;
 import ezreal.service.CreateService;
 
@@ -39,7 +40,9 @@ public class MinionController {
 	
 	@GetMapping("minion/{id}")
 	public String showMinion(@PathVariable int id, Model model) {
-		model.addAttribute("minion", minionRepository.findOne((long)id));
+		Minion minion = minionRepository.findById(id);
+		model.addAttribute("minion", minion);
+		log.info("显示 ID：{}的服务，minion:{}", id, minion.getAddress());
 		return "minionshow";
 	}
 	

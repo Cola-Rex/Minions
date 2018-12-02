@@ -31,7 +31,7 @@ public class MinionLoader implements ApplicationListener<ApplicationReadyEvent> 
 		List<MyServiceInstance> list = eurekaList.getEurekaList();
 		for (MyServiceInstance instance : list) {
 			Minion minion = new Minion();
-			minion.setMinionId(instance.getServiceId());
+			minion.setMinionId(String.valueOf(instance.getPort()));
 			minion.setAddress(instance.getHost() + ":" + instance.getPort());
 			minionRepository.save(minion);
 			log.info("预保存：{}", minion);
