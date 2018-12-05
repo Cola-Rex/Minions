@@ -36,7 +36,7 @@ public class CreateService {
 		List<Minion> list = minionRepository.findAll();
 		//当前数据库中minion的数量
 		long size = minionRepository.count();
-		
+		log.info("当前数据库中的minion数量：{}", size);
 		//创建新的 eureka 配置文件
 		StringBuilder sb = new StringBuilder();
 		if (size == 0) {
@@ -50,12 +50,12 @@ public class CreateService {
 			sb.deleteCharAt(sb.length() - 1); //删除最后1个逗号
 		}
 		log.info("新建 eureka 的 defaultZone : {}", sb);
-		gitService.createFile(size++, sb.toString());
+		gitService.createFile(size+1, sb.toString());
 		
 		//将当前新建 eureka 保存至数据库
 		Minion minion = new Minion();
-		minion.setAddress("localhost:" + size++);
-		minion.setMinionId(String.valueOf(size++));
+		minion.setAddress("localhost:" + (size+9001));
+		minion.setMinionId(String.valueOf(size+1));
 		minionRepository.save(minion);
 		
 		//更新其他 eureka 配置
@@ -74,7 +74,7 @@ public class CreateService {
 		}
 		
 		//调用shell命令创建eureka server
-		String containerId = shellService.createEureka(size++);
+		String containerId = shellService.createEureka(size+1);
 		log.info("新容器ID：{}", containerId);
 		containerList.add(containerId);
 		

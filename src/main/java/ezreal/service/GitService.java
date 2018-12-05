@@ -21,6 +21,7 @@ public class GitService {
 	//http://192.168.31.250/api/v4/projects/1/repository/files/test%2Etxt?
 	//private_token=pj2h2kV-9jwLy42YKz7G&branch=master&content=你是真的皮&commit_message=create%20a%20new%20file
 	public void createFile(long count, String serviceUrl) {
+		log.info("count:{}, service:{}", count, serviceUrl);
 		Map<String, String> map = new HashMap<>();
 		map.put("private_token", "pj2h2kV-9jwLy42YKz7G");
 		map.put("branch", "master"); 					//分支
@@ -50,6 +51,7 @@ public class GitService {
 	}
 	
 	public void updateFile(long count, String serviceUrl) {
+		log.info("更新git文件,eureka-server-peer{}.yml，serviceUri:{}", count-9000, serviceUrl);
 		Map<String, String> map = new HashMap<>();
 		map.put("private_token", "pj2h2kV-9jwLy42YKz7G");
 		map.put("branch", "master"); 					//分支
@@ -74,7 +76,7 @@ public class GitService {
 				"      waitTimeInMsWhenSyncEmpty: 0\r\n" + 
 				"      enableSelfPreservation: false"); 				//内容
 		map.put("commit_message", "create a new file"); //提交信息
-		restTemplate.put("http://192.168.31.250/api/v4/projects/1/repository/files/{fileName}", map, String.class, "eureka-server-peer" + count + ".yml");
+		restTemplate.put("http://192.168.31.250/api/v4/projects/1/repository/files/{fileName}", map, "eureka-server-peer" + (count - 9000) + ".yml");
 		log.info("文件更新成功");
 	}
 	
