@@ -17,7 +17,7 @@ public class ShellService {
 	public String createEureka(long peerNumber) {
 		String containerId = "";
 		try {
-			String cmd = "docker run -d -e \"spring.profiles.active=peer" + peerNumber + "\" --network host eureka-server:0.0.1";
+			String cmd = "docker run -d -e spring.profiles.active=peer" + peerNumber + " --network host eureka-server:0.0.1";
 			log.info("执行命令：{}", cmd);
 			Process process = Runtime.getRuntime().exec(cmd, null, null);
 			
