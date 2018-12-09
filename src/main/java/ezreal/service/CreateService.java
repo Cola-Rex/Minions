@@ -1,6 +1,5 @@
 package ezreal.service;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +27,6 @@ public class CreateService {
 	
 	//保存所有容器ID的集合
 	private List<String> containerList = new ArrayList<>();
-	//保存所有eureka 的地址信息
-	private ArrayList<URI> uriList = new ArrayList<>();
 	
 	public void createEureka() {
 		//从数据库获取所有minion
@@ -67,7 +64,7 @@ public class CreateService {
 				for (Minion temp : tempList) {
 					tempString.append("http://" + temp.getAddress() + "/eureka/,");
 				}
-				tempString.append(minion.getAddress());//最后添加上面新建eureka的uri
+				tempString.append("http://" + minion.getAddress() + "/eureka/");//最后添加上面新建eureka的uri
 				log.info("更新服务：{}，serviceUri:{}", mi.getMinionId(), tempString);
 				gitService.updateFile(Long.parseLong(mi.getAddress().split(":")[1]), tempString.toString());
 			}
@@ -79,7 +76,7 @@ public class CreateService {
 		containerList.add(containerId);
 		
 		// 使用 /refresh 接口重启其他服务
-		refreshService.refresh(uriList);
+		refreshService.refresh(list);
 	}
 	
 }
